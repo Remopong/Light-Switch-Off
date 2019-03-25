@@ -1,8 +1,5 @@
 /*
-
-Demonstrates simple RX and TX operation.
-Please read the notes in NRFLite.h for a description of all library features.
-
+ * 
 Radio    Arduino
 CE    -> 9
 CSN   -> 10 (Hardware SPI SS)
@@ -32,7 +29,7 @@ struct RadioPacket // Any packet up to 32 bytes can be sent.
     int parents;
 };
 
-struct toSend // Any packet up to 32 bytes can be sent.
+struct toSend
 {
     int SwitchOff = 1;
 };

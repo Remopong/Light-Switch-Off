@@ -1,8 +1,5 @@
 /*
 
-Demonstrates simple RX and TX operation.
-Please read the notes in NRFLite.h for a description of all library features.
-
 Radio    Arduino
 CE    -> 9
 CSN   -> 10 (Hardware SPI SS)
@@ -24,12 +21,12 @@ const static uint8_t DESTINATION_RADIO_ID = 2; // Id of the radio we will transm
 const static uint8_t PIN_RADIO_CE = 6;
 const static uint8_t PIN_RADIO_CSN = 10;
 
-struct RadioPacket // Any packet up to 32 bytes can be sent.
+struct RadioPacket
 {
     int parents = 0;
 };
 
-struct toSend // Any packet up to 32 bytes can be sent.
+struct toSend.
 {
     int SwitchOff = 0;
 };
@@ -63,7 +60,7 @@ void loop()
     
     if(lumiVal >= 200){
       
-       //lumiere Allumée
+       //Light on
       _radioData.parents = 1;
       _radio.send(DESTINATION_RADIO_ID, &_radioData, sizeof(_radioData)); // Note how '&' must be placed in front of the variable name.
        Serial.println(_radioData.parents);
