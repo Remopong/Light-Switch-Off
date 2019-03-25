@@ -17,7 +17,11 @@ GND   -> GND
 
 #include <SPI.h>
 #include <NRFLite.h>
-int out = 7;
+
+int out = 6;
+int in = 7;
+int buttonState = 0;
+
 const static uint8_t RADIO_ID = 2;       // Our radio's id.  The transmitter will send to this id.
 const static uint8_t DESTINATION_RADIO_ID = 3;
 const static uint8_t PIN_RADIO_CE = 6;
@@ -39,10 +43,11 @@ toSend _sender;
 
 void setup()
 {
-    Serial.begin(9600);
-    pinMode(out, OUTPUT);
-
-    if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
+  Serial.begin(9600);
+  pinMode(in, INPUT);
+  pinMode(out, OUTPUT);
+  buttonState = LOW;
+        if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
     {
         Serial.println("Cannot communicate with radio");
     }
@@ -51,19 +56,31 @@ void setup()
 
 void loop()
 {
-//  delay(5000);
-//  _radio.send(DESTINATION_RADIO_ID, &_sender, sizeof(_sender));
-//  Serial.println("done");
-    while (_radio.hasData())
+
+    buttonState = LOW;
+
+
+    if (buttonState == LOW) {
+      
+      while (_radio.hasData())
     {
+      
         _radio.readData(&_radioData);
+        Serial.print("Receiving = ");
         String msg = "";
         msg += _radioData.parents;
+        
         Serial.println(msg);
+        
         if(_radioData.parents == 1){
         digitalWrite(out, HIGH);
         }else{
           digitalWrite(out, LOW);
-        }
-    }
+          }
+     }
+}else{
+  
+  _radio.send(DESTINATION_RADIO_ID, &_sender, sizeof(_sender));
+  Serial.println("Sending");
+  }
 }

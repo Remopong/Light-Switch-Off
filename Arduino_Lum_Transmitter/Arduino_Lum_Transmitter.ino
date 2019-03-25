@@ -26,7 +26,7 @@ const static uint8_t PIN_RADIO_CSN = 10;
 
 struct RadioPacket // Any packet up to 32 bytes can be sent.
 {
-    int parents = 12;
+    int parents = 0;
 };
 
 struct toSend // Any packet up to 32 bytes can be sent.
@@ -41,41 +41,47 @@ toSend _sender;
 void setup()
 {
     Serial.begin(9600);
-    if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
+
+
+    pinMode(4, OUTPUT);
+    digitalWrite(4, HIGH);
+
+          if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
     {
         Serial.println("Cannot communicate with radio");
     }
 
-    pinMode(4, OUTPUT);
-    digitalWrite(4, HIGH);
-  
 }
 
 void loop()
 {
-//while (_radio.hasData())
-//    {
-//        _radio.readData(&_sender);
-//        String msg = "";
-//        msg += _sender.SwitchOff;
-//        Serial.println(msg);
-//        if(_sender.SwitchOff == 1){
-//        digitalWrite(4, LOW);
-//        }
-//        
-//        
-//    }
+  
+    int lumiVal = analogRead(lumiPin);
+    lumiVal = 50;
+    
+    Serial.println(lumiVal);
+    
+    if(lumiVal >= 200){
       
-//    int lumiVal = analogRead(lumiPin);
-//    //Serial.println(lumiVal);
-//   
-//    if(lumiVal >= 200){
-//      // lumiere Allumée
-//      _radioData.parents = 1;
-    _radio.send(DESTINATION_RADIO_ID, &_radioData, sizeof(_radioData)); // Note how '&' must be placed in front of the variable name.
-    Serial.println("pass");
-//}else{
-//  _radioData.parents = 0;
-//  _radio.send(DESTINATION_RADIO_ID, &_radioData, sizeof(_radioData)); // Note how '&' must be placed in front of the variable name.
-//  }
+       //lumiere Allumée
+      _radioData.parents = 1;
+      _radio.send(DESTINATION_RADIO_ID, &_radioData, sizeof(_radioData)); // Note how '&' must be placed in front of the variable name.
+       Serial.println(_radioData.parents);
+      
+}else{
+  
+    while (_radio.hasData())
+    {
+        _radio.readData(&_sender);
+        String msg = "";
+        msg += _sender.SwitchOff;
+        Serial.println(msg);
+        if(_sender.SwitchOff == 1){
+        digitalWrite(4, LOW);
+        }
+    }
+    
+  _radioData.parents = 0;
+  
+   }
 }
