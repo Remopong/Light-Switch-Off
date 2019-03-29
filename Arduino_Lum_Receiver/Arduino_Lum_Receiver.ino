@@ -54,11 +54,10 @@ void setup()
 void loop()
 {
 
-    buttonState = LOW;
-
+    buttonState = digitalRead(in);
 
     if (buttonState == LOW) {
-      
+      _sender.SwitchOff = 0;
       while (_radio.hasData())
     {
       
@@ -77,7 +76,7 @@ void loop()
      }
 }else{
   
-  _radio.send(DESTINATION_RADIO_ID, &_sender, sizeof(_sender));
+   _radio.send(DESTINATION_RADIO_ID, &_sender, sizeof(_sender));
   Serial.println("Sending");
   }
 }
