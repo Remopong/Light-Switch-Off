@@ -11,65 +11,48 @@
   GND   -> GND
 
 */
-
 #include <SPI.h>
 #include <NRFLite.h>
-
 int in = 8;
 int buttonState = 0;
-
 const static uint8_t RADIO_ID = 2;       // Our radio's id.  The transmitter will send to this id.
 const static uint8_t DESTINATION_RADIO_ID = 3;
 const static uint8_t PIN_RADIO_CE = 6;
 const static uint8_t PIN_RADIO_CSN = 10;
+int parents;
 
-struct RadioPacket // Any packet up to 32 bytes can be sent.
-{
-  int parents;
-};
-
-struct toSend
-{
+typedef struct sender{
   int SwitchOff = 1;
-};
+}              _send;
 
 NRFLite _radio;
-RadioPacket _radioData;
-toSend _sender;
+_send toSend;
 
 void setup()
 {
   Serial.begin(9600);
   pinMode(in, INPUT_PULLUP);
-
   buttonState = LOW;
   if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
-  {
     Serial.println("Cannot communicate with radio");
-  }
-
 }
 
 void loop()
 {
-
   buttonState = digitalRead(in);
-
-  if (buttonState == LOW) {
-    _sender.SwitchOff = 0;
+  if (buttonState == 1) {
+    toSend.SwitchOff = 0;
     while (_radio.hasData())
     {
-
-      _radio.readData(&_radioData);
+      _radio.readData(&parents);
       Serial.print("Receiving = ");
       String msg = "";
-      msg += _radioData.parents;
-
+      msg += parents;
       Serial.println(msg);
     }
   } else {
-
-    _radio.send(DESTINATION_RADIO_ID, &_sender, sizeof(_sender));
+    toSend.SwitchOff = 1;
     Serial.println("Sending");
+    _radio.send(DESTINATION_RADIO_ID, &toSend, sizeof(toSend));
   }
 }

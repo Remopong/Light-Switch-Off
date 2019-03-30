@@ -11,82 +11,55 @@
   GND   -> GND
 
 */
-
 #include <SPI.h>
 #include <NRFLite.h>
-
 int pinRelay = 8;
-
 int lumiPin = A0;
-
 const static uint8_t RADIO_ID = 3;             // Our radio's id.
 const static uint8_t DESTINATION_RADIO_ID = 2; // Id of the radio we will transmit to.
 const static uint8_t PIN_RADIO_CE = 6;
 const static uint8_t PIN_RADIO_CSN = 10;
-
 int failedCount = 0;
-
-struct RadioPacket
-{
-  int parents = 0;
-};
-
-struct toSend
-{
+int parents = 0;
+struct receive{
   int SwitchOff;
 };
 
 NRFLite _radio;
-RadioPacket _radioData;
-toSend _sender;
+receive _Received;
 
 void setup()
 {
-
   pinMode(pinRelay, OUTPUT);
   digitalWrite(pinRelay, HIGH);
-
   Serial.begin(9600);
-
   if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
-  {
     Serial.println("Cannot communicate with radio");
-  }
-
 }
 
 void loop()
 {
   Serial.println(failedCount);
   delay(1000);
-
   int lumiVal = analogRead(lumiPin);
   lumiVal = 50;
-
   //Serial.println(lumiVal);
-
-
   if (lumiVal >= 200) {
-
     //Light on
-    _radioData.parents = 1;
-    if (_radio.send(DESTINATION_RADIO_ID, &_radioData, sizeof(_radioData))) // Note how '&' must be placed in front of the variable name.
+    parents = 1;
+    if (_radio.send(DESTINATION_RADIO_ID, &parents, sizeof(parents))) // Note how '&' must be placed in front of the variable name.
     {
-      Serial.println(_radioData.parents);
+      Serial.println(parents);
       failedCount = 0;
-    } else
-    {
+    } else {
       Serial.println("Failed");
       failedCount ++;
     }
-
-
   } else {
-    _radioData.parents = 0;
-
-    if (_radio.send(DESTINATION_RADIO_ID, &_radioData, sizeof(_radioData))) // Note how '&' must be placed in front of the variable name.
+    parents = 0;
+    if (_radio.send(DESTINATION_RADIO_ID, &parents, sizeof(parents))) // Note how '&' must be placed in front of the variable name.
     {
-      Serial.println(_radioData.parents);
+      Serial.println(parents);
       failedCount = 0;
     } else
     {
@@ -94,25 +67,17 @@ void loop()
       failedCount ++;
     }
   }
-
-  if (failedCount >= 10) {
-
+  if (failedCount >= 5) {
     Serial.println("Inside");
-
     if (_radio.hasData()) {
       Serial.println("Receive");
-      _radio.readData(&_sender);
+      _radio.readData(&_Received);
       String msg = "";
-      msg += _sender.SwitchOff;
+      msg += _Received.SwitchOff;
       Serial.println(msg);
-
-      if (_sender.SwitchOff == 1) {
-
+      if (_Received.SwitchOff == 1) {
         digitalWrite(pinRelay, LOW);
-
         Serial.println("Action");
-
-
       }
     }
   }
