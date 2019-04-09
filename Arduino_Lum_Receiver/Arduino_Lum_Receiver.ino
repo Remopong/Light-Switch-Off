@@ -31,6 +31,7 @@ _send toSend;
 void setup()
 {
   Serial.begin(9600);
+  Serial.println("Setup");
   pinMode(in, INPUT_PULLUP);
   buttonState = LOW;
   if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
@@ -39,6 +40,7 @@ void setup()
 
 void loop()
 {
+  Serial.println("Loop");
   buttonState = digitalRead(in);
   if (buttonState == 1) {
     toSend.SwitchOff = 0;
@@ -53,6 +55,8 @@ void loop()
   } else {
     toSend.SwitchOff = 1;
     Serial.println("Sending");
-    _radio.send(DESTINATION_RADIO_ID, &toSend, sizeof(toSend));
+    if(_radio.send(DESTINATION_RADIO_ID, &toSend, sizeof(toSend))){
+      Serial.println("Recu par le correspondant");
+    }
   }
 }

@@ -13,7 +13,7 @@
 */
 #include <SPI.h>
 #include <NRFLite.h>
-int pinRelay = 8;
+int pinOUT = 8;
 int lumiPin = A0;
 const static uint8_t RADIO_ID = 3;             // Our radio's id.
 const static uint8_t DESTINATION_RADIO_ID = 2; // Id of the radio we will transmit to.
@@ -30,8 +30,8 @@ receive _Received;
 
 void setup()
 {
-  pinMode(pinRelay, OUTPUT);
-  digitalWrite(pinRelay, HIGH);
+  pinMode(pinOUT, OUTPUT);
+  digitalWrite(pinOUT, LOW);
   Serial.begin(9600);
   if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
     Serial.println("Cannot communicate with radio");
@@ -67,7 +67,7 @@ void loop()
       failedCount ++;
     }
   }
-  if (failedCount >= 5) {
+  if (failedCount >= 2) {
     Serial.println("Inside");
     if (_radio.hasData()) {
       Serial.println("Receive");
@@ -76,7 +76,7 @@ void loop()
       msg += _Received.SwitchOff;
       Serial.println(msg);
       if (_Received.SwitchOff == 1) {
-        digitalWrite(pinRelay, LOW);
+        pinMode(pinOUT, INPUT);
         Serial.println("Action");
       }
     }
